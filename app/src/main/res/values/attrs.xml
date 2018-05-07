@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="RatioImageView">
+        <attr name="ratio" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="NineGridLayout">
+        <attr name="sapcing" format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="SplashView">
+        <attr name="splashIcon" format="reference" />
+        <attr name="iconColor" format="color" />
+        <attr name="holeFillColor" format="color" />
+        <attr name="duration" format="integer" />
+        <attr name="removeFromParentOnEnd" format="boolean" />
+    </declare-styleable>
+</resources>

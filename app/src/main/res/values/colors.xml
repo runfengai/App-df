@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="index_start">#2da5e1</color>
+    <color name="index_start_p">#198cc6</color>
+
+    <color name="login_line">#dcdcdc</color>
+    <color name="login_line_press">#34abed</color>
+    <color name="colorTabText">#73C53D</color>
+
+    <!--Splash-->
+    <color name="white">#FFFFFF</color>
+    <color name="splashBgColor">#f44336</color>
+
+    <!--RefreshLayout-->
+    <color name="refresh_progress_1">#536DFE</color>
+    <color name="refresh_progress_2">#f44336</color>
+    <color name="refresh_progress_3">#FF4081</color>
+
+    <!--WeiBo Content-->
+    <color name="black">#000000</color>
+    <color name="blue">#3F51B5</color>
+    <color name="dark_blue">#303F9F</color>
+
+    <!--Emotion-->
+    <color name="transparent">#00000000</color>
+    <color name="bg_gray">#f2f2f2</color>
+
+
+    <color name="btn_pop_n">#a7a4a4</color>
+    <color name="btn_pop_h">#dedbdb</color>
+
+</resources>

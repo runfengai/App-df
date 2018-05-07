@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_weibo_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/border"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/iv_weibo_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@mipmap/icon_defult" />
+
+    <LinearLayout
+        android:id="@+id/layout_weibo_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <RelativeLayout
+            android:id="@+id/layout_weibo_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_weibo_userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="校园风景" />
+
+            <TextView
+                android:id="@+id/tv_weibo_org"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="15dp"
+                android:layout_toEndOf="@+id/tv_weibo_userName"
+                android:textSize="8sp"
+                android:textStyle="bold"
+                tools:text="iPhone6s" />
+
+            <TextView
+                android:id="@+id/tv_weibo_create_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/tv_weibo_org"
+                android:textSize="10sp"
+                tools:text="2分" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_weibo_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/school"
+            android:text="校园风景校园风景校园风景校园风景校园风景校园风景校园风景校园风景校园风景"
+            android:textColor="@color/black"
+            android:textSize="10sp" />
+
+        <ImageView
+            android:id="@+id/tv_weibo_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/school"
+            android:textColor="@color/black"
+            android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>

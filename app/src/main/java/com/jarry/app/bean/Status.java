@@ -3,7 +3,9 @@ package com.jarry.app.bean;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.MapCollection;
 import com.litesuits.orm.db.annotation.Mapping;
+import com.litesuits.orm.db.annotation.PrimaryKey;
 import com.litesuits.orm.db.annotation.Table;
+import com.litesuits.orm.db.enums.AssignType;
 import com.litesuits.orm.db.enums.Relation;
 
 import java.io.Serializable;
@@ -12,7 +14,8 @@ import java.util.List;
 
 @Table("status")
 public class Status implements Serializable, Cloneable {
-
+    @PrimaryKey(AssignType.AUTO_INCREMENT)
+    public int autoId;
     @Column("created_at")
     private String created_at;
     @Column("id")
@@ -183,6 +186,8 @@ public class Status implements Serializable, Cloneable {
 
     @Table("thumbnailpic")
     public static class ThumbnailPic implements Serializable {
+        @PrimaryKey(AssignType.AUTO_INCREMENT)
+        private int autoId;
         @Column("thumbnail_pic")
         private String thumbnail_pic;
         @Column("localpic")

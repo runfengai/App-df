@@ -3,12 +3,16 @@ package com.jarry.app.bean;
 import com.jarry.app.App;
 import com.jarry.app.util.PrefUtils;
 import com.litesuits.orm.db.annotation.Column;
+import com.litesuits.orm.db.annotation.PrimaryKey;
 import com.litesuits.orm.db.annotation.Table;
+import com.litesuits.orm.db.enums.AssignType;
 
 import java.io.Serializable;
 
 @Table("user")
 public class User implements Serializable {
+    @PrimaryKey(AssignType.AUTO_INCREMENT)
+    private int autoid;
     @Column("id")
     private String id;
     @Column("idstr")

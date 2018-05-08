@@ -54,23 +54,28 @@ public class CommentFun {
                 commentList.addView(textView);
             }
             textView.setVisibility(View.VISIBLE);
-            if (comment.mReceiver == null) { // 没有评论接受者
-                content = String.format("<html><%s>%s</%s>: <%s>%s</%s></html>", CustomTagHandler.TAG_COMMENTATOR,
-                        comment.mCommentator.mName, CustomTagHandler.TAG_COMMENTATOR,
-                        CustomTagHandler.TAG_CONTENT, comment.mContent, CustomTagHandler.TAG_CONTENT);
-            } else {
-                content = String.format("<html><%s>%s</%s> 回复 <%s>%s</%s>: <%s>%s</%s><html>",
-                        CustomTagHandler.TAG_COMMENTATOR, comment.mCommentator.mName, CustomTagHandler.TAG_COMMENTATOR,
-                        CustomTagHandler.TAG_RECEIVER, comment.mReceiver.mName, CustomTagHandler.TAG_RECEIVER,
-                        CustomTagHandler.TAG_CONTENT, comment.mContent, CustomTagHandler.TAG_CONTENT);
-            }
-            textView.setText(Html.fromHtml(content, null, tagHandler)); // 解析标签
-            textView.setClickable(true);
-            textView.setMovementMethod(LinkMovementMethod.getInstance());
-            textView.setTag(CustomTagHandler.KEY_COMMENTATOR, comment.mCommentator);
-            textView.setTag(CustomTagHandler.KEY_RECEIVER, comment.mReceiver);
+            try {
+                if (comment.mReceiver == null) { // 没有评论接受者
+                    content = String.format("<html><%s>%s</%s>: <%s>%s</%s></html>", CustomTagHandler.TAG_COMMENTATOR,
+                            comment.mCommentator.mName, CustomTagHandler.TAG_COMMENTATOR,
+                            CustomTagHandler.TAG_CONTENT, comment.mContent, CustomTagHandler.TAG_CONTENT);
+                } else {
+                    content = String.format("<html><%s>%s</%s> 回复 <%s>%s</%s>: <%s>%s</%s><html>",
+                            CustomTagHandler.TAG_COMMENTATOR, comment.mCommentator.mName, CustomTagHandler.TAG_COMMENTATOR,
+                            CustomTagHandler.TAG_RECEIVER, comment.mReceiver.mName, CustomTagHandler.TAG_RECEIVER,
+                            CustomTagHandler.TAG_CONTENT, comment.mContent, CustomTagHandler.TAG_CONTENT);
+                }
+                textView.setText(Html.fromHtml(content, null, tagHandler)); // 解析标签
+                textView.setClickable(true);
+                textView.setMovementMethod(LinkMovementMethod.getInstance());
+                textView.setTag(CustomTagHandler.KEY_COMMENTATOR, comment.mCommentator);
+                textView.setTag(CustomTagHandler.KEY_RECEIVER, comment.mReceiver);
 
-            textView.setTag(KEY_COMMENT_SOURCE_COMMENT_LIST, mCommentList);
+                textView.setTag(KEY_COMMENT_SOURCE_COMMENT_LIST, mCommentList);
+            } catch (Exception e) {
+            }
+
+
         }
         for (; i < commentList.getChildCount(); i++) {
             commentList.getChildAt(i).setVisibility(View.GONE);

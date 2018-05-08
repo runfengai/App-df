@@ -35,7 +35,7 @@ public class App extends Application {
         super.onCreate();
         new DBHelper(this);
         instance = this;
-        mDb = LiteOrm.newSingleInstance(this, DB_NAME);
+        mDb = LiteOrm.newCascadeInstance(this, DB_NAME);
         if (BuildConfig.DEBUG) {
             mDb.setDebugged(true);
         }

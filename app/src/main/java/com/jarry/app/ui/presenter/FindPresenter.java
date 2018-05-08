@@ -24,6 +24,7 @@ import com.jarry.app.ui.view.IFindView;
 import com.jarry.app.util.CommentFun;
 import com.jarry.app.util.CustomTagHandler;
 import com.jarry.app.util.PrefUtils;
+import com.litesuits.orm.LiteOrm;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -64,7 +65,7 @@ public class FindPresenter extends BasePresenter<IFindView> {
             recyclerView = homeView.getRecyclerView();
             layoutManager = homeView.getLayoutManager();
             List<Status> cached = getPageOneDataFromDB();
-            if (cached == null || cached.size() == 0)
+            if (cached == null || cached.size() < 2)
                 getPageOneDataFromNet();
             else {
                 onePagelist = cached;
@@ -76,9 +77,13 @@ public class FindPresenter extends BasePresenter<IFindView> {
     }
 
     private void saveListToDB(List<Status> onePagelist) {
-        for (Status status : onePagelist) {
-            App.mDb.insert(status);
-        }
+        LiteOrm liteOrm = LiteOrm.newCascadeInstance(context, "find.db");
+        liteOrm.insert(onePagelist);
+
+        App.mDb.cascade().save(onePagelist);
+//        for (Status status : onePagelist) {
+//            App.mDb.insert(status);
+//        }
         Log.e("TT", "= onePagelist.size()=" + onePagelist.size());
 
     }
@@ -126,8 +131,11 @@ public class FindPresenter extends BasePresenter<IFindView> {
     }
 
     private List<Status> getPageOneDataFromDB() {
-        List<Status> res = StatusDao.getAll();
-        return res;
+        try {
+            return StatusDao.getAll();
+        } catch (Exception e) {
+        }
+        return null;
     }
 
     private List<Status> getPageOneDataFromNet() {

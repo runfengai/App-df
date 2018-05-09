@@ -1,5 +1,9 @@
 package com.jarry.app.db;
 
+import android.text.TextUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jarry.app.App;
 import com.jarry.app.bean.Comment;
 import com.jarry.app.bean.Status;
@@ -17,8 +21,19 @@ public class StatusDao {
         App.mDb.insert(status);
     }
 
+    static Gson gson = new Gson();
+
     public static List<Status> getAll() {
         List<Status> res = App.mDb.query(Status.class);
+        for (Status status : res) {
+            status.setUser(gson.fromJson(status.userStr, User.class));
+            status.setmComment(
+                    gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
+                    }.getType()));
+            status.setLikeUsers(
+                    gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
+                    }.getType()));
+        }
         return res;
     }
 
@@ -27,6 +42,14 @@ public class StatusDao {
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
             if (status.getUser().getScreen_name().equals(App.getUser().getScreen_name())) {
+                status.setUser(gson.fromJson(status.userStr, User.class));
+                status.setmComment(
+                        gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
+                        }.getType()));
+                status.setLikeUsers(
+                        gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
+                        }.getType()));
+
                 res.add(status);
             }
         }
@@ -41,6 +64,13 @@ public class StatusDao {
             List<User> users = status.getLikeUsers();
             for (User user : users) {
                 if (user.getScreen_name().equals(App.getUser().getScreen_name())) {
+                    status.setUser(gson.fromJson(status.userStr, User.class));
+                    status.setmComment(
+                            gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
+                            }.getType()));
+                    status.setLikeUsers(
+                            gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
+                            }.getType()));
                     res.add(status);
                     break;
                 }
@@ -55,8 +85,19 @@ public class StatusDao {
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
             List<Comment> comments = status.getmComment();
+            if (comments == null) continue;
             for (Comment comment : comments) {
-                if (comment.mCommentator.equals(App.getUser().getScreen_name())) {
+                if (comment.mCommentator == null) {
+                    continue;
+                }
+                if (comment.mCommentator.mName != null && comment.mCommentator.mName.equals(App.getUser().getScreen_name())) {
+                    status.setUser(gson.fromJson(status.userStr, User.class));
+                    status.setmComment(
+                            gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
+                            }.getType()));
+                    status.setLikeUsers(
+                            gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
+                            }.getType()));
                     res.add(status);
                     break;
                 }

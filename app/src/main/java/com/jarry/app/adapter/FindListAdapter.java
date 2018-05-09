@@ -10,6 +10,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.jarry.app.App;
 import com.jarry.app.R;
 import com.jarry.app.bean.Comments;
 import com.jarry.app.bean.Favorite;
@@ -39,6 +42,7 @@ import com.jarry.app.view.ClickCircleImageView;
 import com.jarry.app.view.LikesView;
 import com.jarry.app.view.ninegridlayout.NineGridlayout;
 import com.jarry.app.view.ninegridlayout.OneImage;
+import com.litesuits.orm.db.model.ConflictAlgorithm;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -273,6 +277,11 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             CommentFun.inputComment((Activity) context, recyclerView, v, receiver, new CommentFun.InputCommentListener() {
                 @Override
                 public void onCommitComment() {
+                    //存数据库
+                    Status status = (Status) v.getTag();
+                    Log.e("ttt", new Gson().toJson(receiver));
+                    Log.e("tt", status == null ? "null" : new Gson().toJson(status.mComment));
+                    App.mDb.insert(status, ConflictAlgorithm.Replace);
                     notifyDataSetChanged();
                 }
             });
@@ -295,6 +304,7 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @SuppressLint("RestrictedApi")
         public void bindItem(Context context, Status status) {
+            mBtnInput.setTag(status);
 //            if (status.getText().contains("抱歉，已被删除")) {
 //                layout_weibo_zhuanfa.setVisibility(View.GONE);
 //                tv_weibo_text.setText(StringUtil.getWeiBoText(context, status.getText()));
@@ -350,6 +360,8 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         //暂时认为名字唯一
                         if (user.getName().equals(User.getLoginUser().getName())) {
                             status.likeUsers.remove(user);
+                            //删除喜欢
+                            App.mDb.insert(status, ConflictAlgorithm.Replace);
                             setDrawableSize(tv_weibo_attitudes_count, R.drawable.good_16px);
                             notifyDataSetChanged();
                             return;
@@ -360,6 +372,7 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     status.likeUsers = new ArrayList<>();
                 }
                 status.likeUsers.add(User.getLoginUser());
+                App.mDb.insert(status, ConflictAlgorithm.Replace);
                 setDrawableSize(tv_weibo_attitudes_count, R.drawable.good_h);
                 notifyDataSetChanged();
             });

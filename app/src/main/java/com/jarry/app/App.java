@@ -61,7 +61,8 @@ public class App extends Application {
             QueryBuilder<User> qb = new QueryBuilder<>(User.class);
             qb.whereEquals("id", userSp);
             List<User> users = App.mDb.query(qb);
-            users.get(0);
+            if (users != null && users.size() > 0)
+                return users.get(0);
         }
 
         return null;

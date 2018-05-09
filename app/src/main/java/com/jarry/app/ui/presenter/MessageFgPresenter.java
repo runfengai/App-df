@@ -194,7 +194,8 @@ public class MessageFgPresenter extends BasePresenter<IMessageFgView> {
                 adapter.updateLoadStatus(adapter.LOAD_NONE);
                 return;
             }
-            mList.addAll(list);
+            if (list != null)
+                mList.addAll(list);
             adapter.notifyDataSetChanged();
         } else {
             mList.clear();

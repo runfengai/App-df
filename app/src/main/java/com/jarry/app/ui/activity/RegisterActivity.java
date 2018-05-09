@@ -186,6 +186,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             focusView = mUserNameView;
             cancel = true;
         }
+        if (email.length() < 2) {
+            mUserNameView.setError("用户名过短");
+            focusView = mUserNameView;
+            cancel = true;
+        }
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -361,9 +366,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                     mPasswordView.setError(errorMsg);
                     mPasswordView.requestFocus();
                 }
+                showProgress(false);
             }
             mAuthTask = null;
-//            showProgress(false);
+
         }
 
         @Override

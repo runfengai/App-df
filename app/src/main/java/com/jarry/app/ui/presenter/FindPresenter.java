@@ -25,6 +25,7 @@ import com.jarry.app.util.CommentFun;
 import com.jarry.app.util.CustomTagHandler;
 import com.jarry.app.util.PrefUtils;
 import com.litesuits.orm.LiteOrm;
+import com.litesuits.orm.db.model.ConflictAlgorithm;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -77,8 +78,14 @@ public class FindPresenter extends BasePresenter<IFindView> {
     }
 
     private void saveListToDB(List<Status> onePagelist) {
-        LiteOrm liteOrm = LiteOrm.newCascadeInstance(context, "find.db");
-        liteOrm.insert(onePagelist);
+        Gson gson = new Gson();
+        for (Status status : onePagelist) {
+            status.userStr = gson.toJson(status.getUser());
+            status.mCommentStr = gson.toJson(status.mComment);
+            status.likeUsersStr = gson.toJson(status.likeUsers);
+        }
+//        LiteOrm liteOrm = LiteOrm.newCascadeInstance(context, "find.db");
+//        liteOrm.cascade().save(onePagelist);
 
         App.mDb.cascade().save(onePagelist);
 //        for (Status status : onePagelist) {
@@ -90,6 +97,12 @@ public class FindPresenter extends BasePresenter<IFindView> {
 
     public void showSendWeibo(Status status) {
         mList.add(0, status);
+        Gson gson = new Gson();
+        status.userStr = gson.toJson(status.getUser());
+        status.mCommentStr = gson.toJson(status.mComment);
+        status.likeUsersStr = gson.toJson(status.likeUsers);
+        //存储到本地数据库
+        App.mDb.insert(status, ConflictAlgorithm.Replace);
         adapter.notifyDataSetChanged();
         StatusDao.save(status);
     }
@@ -100,7 +113,7 @@ public class FindPresenter extends BasePresenter<IFindView> {
             recyclerView = homeView.getRecyclerView();
             layoutManager = homeView.getLayoutManager();
             List<Status> more = getMoreData();
-            App.mDb.save(more);
+            App.mDb.cascade().save(more);
             disPlayWeiBoList(more, context, homeView, recyclerView);
         }
     }

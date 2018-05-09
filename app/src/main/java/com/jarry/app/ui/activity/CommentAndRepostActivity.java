@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jarry.app.App;
 import com.jarry.app.R;
 import com.jarry.app.base.MVPBaseActivity;
 import com.jarry.app.bean.Comments;
@@ -24,6 +25,7 @@ import com.jarry.app.ui.presenter.CARPresenter;
 import com.jarry.app.ui.view.ICARView;
 import com.jarry.app.util.StringUtil;
 import com.jarry.app.util.ViewUtil;
+import com.litesuits.orm.db.model.ConflictAlgorithm;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -178,6 +180,8 @@ public class CommentAndRepostActivity extends MVPBaseActivity<ICARView, CARPrese
             Toast.makeText(this, R.string.not_null, Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, tag + "成功！", Toast.LENGTH_LONG).show();
+            //转发微博
+            App.mDb.insert(status, ConflictAlgorithm.Replace);
             finish();
 //            if (tag.equals("回复微博")) {
 //                mPresenter.postComment(text, weibo_id);

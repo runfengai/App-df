@@ -1,7 +1,6 @@
 package com.jarry.app.bean;
 
 import com.litesuits.orm.db.annotation.Column;
-import com.litesuits.orm.db.annotation.MapCollection;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
 import com.litesuits.orm.db.annotation.Table;
@@ -10,14 +9,15 @@ import com.litesuits.orm.db.enums.Relation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 @Table("status")
 public class Status implements Serializable, Cloneable {
+
     @PrimaryKey(AssignType.AUTO_INCREMENT)
-    public int autoId;
+    public Long autoId;
     @Column("created_at")
     private String created_at;
+    @PrimaryKey(AssignType.BY_MYSELF)
     @Column("id")
     private String id;
     @Column("idstr")
@@ -46,7 +46,7 @@ public class Status implements Serializable, Cloneable {
     @Mapping(Relation.ManyToOne)
     private User user;
     @Column("userstr")
-    private String userStr;
+    public String userStr;
     @Mapping(Relation.OneToMany)
     public ArrayList<Comment> mComment; // 评论列表
     @Column("mcommentstr")

@@ -29,7 +29,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static UserComm sUser = new UserComm(1, "李小龙"); // 当前登录用户
+    public static UserComm sUser = null; // 当前登录用户
     public static final int TAB_WECHAT = 0;
     public static final int TAB_FRIEND = 1;
     public static final int TAB_CONTACTS = 2;
@@ -47,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
         actionBar = getSupportActionBar();
         ButterKnife.bind(this);
         initTabItemData();
+        User user = App.getUser();
+        Long id = 0L;
+        try {
+            id = Long.valueOf(user.getId());
+        } catch (Exception e) {
+            id = 0L;
+        }
+        sUser = new UserComm(id, user.getScreen_name());
     }
 
     @Override

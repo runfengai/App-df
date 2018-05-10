@@ -41,6 +41,7 @@ public class Status implements Serializable, Cloneable {
     private String attitudes_count;
     @Mapping(Relation.OneToOne)
     private Status retweeted_status;
+    public String retweeted_statusStr;
     @Mapping(Relation.OneToMany)
     private ArrayList<ThumbnailPic> pic_urls;
 
@@ -56,6 +57,10 @@ public class Status implements Serializable, Cloneable {
     public ArrayList<User> likeUsers; // 点赞列表
     @Column("likeUsersStr")
     public String likeUsersStr;
+
+    public void setRetweeted_statusStr() {
+        this.retweeted_statusStr =new Gson().toJson(retweeted_status);
+    }
 
     public void setLikeUsersStr() {
         this.likeUsersStr = new Gson().toJson(likeUsers);

@@ -242,6 +242,7 @@ public class CommentAndRepostActivity extends MVPBaseActivity<ICARView, CARPrese
             status.setReposts_count("0");
             Toast.makeText(this, tag + "成功！", Toast.LENGTH_LONG).show();
             //转发微博
+            status.setRetweeted_statusStr();
             App.mDb.insert(status, ConflictAlgorithm.Replace);
             Intent intent = new Intent();
 //            intent.putExtra("weibo", status);

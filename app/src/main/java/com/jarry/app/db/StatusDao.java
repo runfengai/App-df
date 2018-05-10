@@ -28,6 +28,11 @@ public class StatusDao {
     public static List<Status> getAll() {
         List<Status> res = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         for (Status status : res) {
+            try {
+                status.setRetweeted_status(gson.fromJson(status.retweeted_statusStr, Status.class));
+            } catch (Exception e) {
+            }
+
             status.setUser(gson.fromJson(status.userStr, User.class));
             status.setmComment(
                     gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
@@ -43,6 +48,11 @@ public class StatusDao {
         List<Status> all = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
+            try {
+                status.setRetweeted_status(gson.fromJson(status.retweeted_statusStr, Status.class));
+            } catch (Exception e) {
+            }
+
             status.setUser(gson.fromJson(status.userStr, User.class));
             if (status.getUser().getScreen_name().equals(App.getUser().getScreen_name())) {
                 status.setmComment(
@@ -63,6 +73,11 @@ public class StatusDao {
         List<Status> all = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
+            try {
+                status.setRetweeted_status(gson.fromJson(status.retweeted_statusStr, Status.class));
+            } catch (Exception e) {
+            }
+
             status.setLikeUsers(
                     gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
                     }.getType()));
@@ -89,6 +104,11 @@ public class StatusDao {
         List<Status> all = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
+            try {
+                status.setRetweeted_status(gson.fromJson(status.retweeted_statusStr, Status.class));
+            } catch (Exception e) {
+            }
+
             status.setmComment(
                     gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
                     }.getType()));

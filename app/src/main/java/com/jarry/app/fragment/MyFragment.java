@@ -1,11 +1,16 @@
 package com.jarry.app.fragment;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -158,11 +164,45 @@ public class MyFragment extends MVPBaseFragment<IUserView, UserPresenter> implem
                         }).setNegativeButton("取消", null).create().show();
     }
 
+    //适配6.0，权限申请
+    private static final int PERMISSION_READ_DATA = 222;
+
     @OnClick(R.id.iv_user_icon)
     public void selectPic() {
+
         //
         //photo pick
-        photoPick();
+        //先检查权限，如果没有权限，就关闭
+        if (Build.VERSION.SDK_INT >= 23) {//权限检查
+            int checkCallPhonePermission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
+                this.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_DATA);
+                return;
+            } else {
+                photoPick();
+            }
+        } else {
+            photoPick();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            //就像onActivityResult一样这个地方就是判断你是从哪来的。
+            case PERMISSION_READ_DATA:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    photoPick();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(getActivity(), "读取SD卡权限被禁用。。", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     public void photoPick() {
@@ -197,6 +237,7 @@ public class MyFragment extends MVPBaseFragment<IUserView, UserPresenter> implem
         QueryBuilder<User> qb = new QueryBuilder<>(User.class);
         qb.whereEquals("id", userSp);
         List<User> users = App.mDb.query(qb);
+        if (users == null) return User.getLoginUser();
         return users.get(0);
 //        try {
 //            InputStream inputStream = getActivity().getAssets().open("user.json");

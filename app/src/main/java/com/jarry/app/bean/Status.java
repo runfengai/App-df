@@ -41,6 +41,7 @@ public class Status implements Serializable, Cloneable {
     private String attitudes_count;
     @Mapping(Relation.OneToOne)
     private Status retweeted_status;
+    @Column("retweeted_statusStr")
     public String retweeted_statusStr;
     @Mapping(Relation.OneToMany)
     private ArrayList<ThumbnailPic> pic_urls;

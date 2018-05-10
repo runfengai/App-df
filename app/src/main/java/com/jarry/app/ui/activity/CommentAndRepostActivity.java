@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,16 +17,30 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.jarry.app.App;
 import com.jarry.app.R;
 import com.jarry.app.base.MVPBaseActivity;
 import com.jarry.app.bean.Comments;
 import com.jarry.app.bean.Status;
+import com.jarry.app.bean.User;
 import com.jarry.app.ui.presenter.CARPresenter;
 import com.jarry.app.ui.view.ICARView;
+import com.jarry.app.util.DataUtil;
+import com.jarry.app.util.RxBus;
+import com.jarry.app.util.RxEvents;
 import com.jarry.app.util.StringUtil;
 import com.jarry.app.util.ViewUtil;
 import com.litesuits.orm.db.model.ConflictAlgorithm;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -40,6 +55,7 @@ public class CommentAndRepostActivity extends MVPBaseActivity<ICARView, CARPrese
     private static final String TAG = "tag";
 
     private Status status;
+    private Status statusRetreed;
     private String weibo_id;
     private Comments comments;
     private String comment_id;
@@ -100,6 +116,8 @@ public class CommentAndRepostActivity extends MVPBaseActivity<ICARView, CARPrese
      */
     private void parseIntent() {
         status = (Status) getIntent().getSerializableExtra(WEIBO_STATUE);
+        statusRetreed = (Status) deepClone(status);
+        Log.e("rettt", new Gson().toJson(statusRetreed));
         weibo_id = status.getIdstr();
         tag = getIntent().getStringExtra(TAG);
         if (tag.equals("回复微博")) {
@@ -111,6 +129,35 @@ public class CommentAndRepostActivity extends MVPBaseActivity<ICARView, CARPrese
             comment_id = comments.getIdstr();
             cb_is_repost.setText("同时转发到微博");
         }
+    }
+
+//    public Object deepClone(Object obj) throws IOException, OptionalDataException,
+//            ClassNotFoundException {
+//        // 将对象写到流里
+//        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+//        ObjectOutputStream oo = new ObjectOutputStream(bo);
+//        oo.writeObject(obj);
+//        // 从流里读出来
+//        ByteArrayInputStream bi = new ByteArrayInputStream(bo.toByteArray());
+//        ObjectInputStream oi = new ObjectInputStream(bi);
+//        return (oi.readObject());
+//    }
+
+    public static Object deepClone(Object src) {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream out = null;
+        try {
+            out = new ObjectOutputStream(byteOut);
+            out.writeObject(src);
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            ObjectInputStream in = new ObjectInputStream(byteIn);
+            Object dest = in.readObject();
+            return dest;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 
     private void initView() {
@@ -179,9 +226,27 @@ public class CommentAndRepostActivity extends MVPBaseActivity<ICARView, CARPrese
         if (text.equals("")) {
             Toast.makeText(this, R.string.not_null, Toast.LENGTH_LONG).show();
         } else {
+            status.setText(text);
+            status.setUser(App.getUser());
+            status.setRetweeted_status(statusRetreed);
+            Log.e("ret", new Gson().toJson(statusRetreed));
+            status.setCreated_at(DataUtil.convertGMTToLoacale(new Date()));
+            status.setAttitudes_count("0");
+            status.setComments_count("0");
+            status.setReposts_count("0");
+
+            status.setSource("转发");
+            status.setCreated_at(DataUtil.convertGMTToLoacale(new Date()));
+            status.setAttitudes_count("0");
+            status.setComments_count("0");
+            status.setReposts_count("0");
             Toast.makeText(this, tag + "成功！", Toast.LENGTH_LONG).show();
             //转发微博
             App.mDb.insert(status, ConflictAlgorithm.Replace);
+            Intent intent = new Intent();
+//            intent.putExtra("weibo", status);
+//            setResult(RESULT_OK, intent);
+            RxBus.getInstance().send(new RxEvents.UpRefreshClick());
             finish();
 //            if (tag.equals("回复微博")) {
 //                mPresenter.postComment(text, weibo_id);

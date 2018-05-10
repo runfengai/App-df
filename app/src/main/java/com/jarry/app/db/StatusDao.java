@@ -1,6 +1,7 @@
 package com.jarry.app.db;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -8,6 +9,7 @@ import com.jarry.app.App;
 import com.jarry.app.bean.Comment;
 import com.jarry.app.bean.Status;
 import com.jarry.app.bean.User;
+import com.litesuits.orm.db.assit.QueryBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,7 @@ public class StatusDao {
     static Gson gson = new Gson();
 
     public static List<Status> getAll() {
-        List<Status> res = App.mDb.query(Status.class);
+        List<Status> res = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         for (Status status : res) {
             status.setUser(gson.fromJson(status.userStr, User.class));
             status.setmComment(
@@ -38,11 +40,11 @@ public class StatusDao {
     }
 
     public static List<Status> getMy() {
-        List<Status> all = App.mDb.query(Status.class);
+        List<Status> all = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
+            status.setUser(gson.fromJson(status.userStr, User.class));
             if (status.getUser().getScreen_name().equals(App.getUser().getScreen_name())) {
-                status.setUser(gson.fromJson(status.userStr, User.class));
                 status.setmComment(
                         gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
                         }.getType()));
@@ -58,21 +60,24 @@ public class StatusDao {
     }
 
     public static List<Status> getLike() {
-        List<Status> all = App.mDb.query(Status.class);
+        List<Status> all = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
+            status.setLikeUsers(
+                    gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
+                    }.getType()));
             List<User> users = status.getLikeUsers();
-            for (User user : users) {
-                if (user.getScreen_name().equals(App.getUser().getScreen_name())) {
-                    status.setUser(gson.fromJson(status.userStr, User.class));
-                    status.setmComment(
-                            gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
-                            }.getType()));
-                    status.setLikeUsers(
-                            gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
-                            }.getType()));
-                    res.add(status);
-                    break;
+            if (users != null && users.size() > 0) {
+                for (User user : users) {
+                    if (user == null) continue;
+                    if (user.getName().equals(App.getUser().getScreen_name())) {
+                        status.setUser(gson.fromJson(status.userStr, User.class));
+                        status.setmComment(
+                                gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
+                                }.getType()));
+                        res.add(status);
+                        break;
+                    }
                 }
             }
         }
@@ -81,9 +86,12 @@ public class StatusDao {
     }
 
     public static List<Status> getComments() {
-        List<Status> all = App.mDb.query(Status.class);
+        List<Status> all = App.mDb.query(new QueryBuilder<>(Status.class).appendOrderDescBy("created_at"));
         List<Status> res = new ArrayList<>();
         for (Status status : all) {
+            status.setmComment(
+                    gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
+                    }.getType()));
             List<Comment> comments = status.getmComment();
             if (comments == null) continue;
             for (Comment comment : comments) {
@@ -92,9 +100,7 @@ public class StatusDao {
                 }
                 if (comment.mCommentator.mName != null && comment.mCommentator.mName.equals(App.getUser().getScreen_name())) {
                     status.setUser(gson.fromJson(status.userStr, User.class));
-                    status.setmComment(
-                            gson.fromJson(status.mCommentStr, new TypeToken<ArrayList<Comment>>() {
-                            }.getType()));
+
                     status.setLikeUsers(
                             gson.fromJson(status.likeUsersStr, new TypeToken<ArrayList<User>>() {
                             }.getType()));

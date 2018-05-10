@@ -10,6 +10,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -26,6 +29,7 @@ import com.jarry.app.base.MVPBaseFragment;
 import com.jarry.app.bean.Status;
 import com.jarry.app.bean.User;
 import com.jarry.app.db.UserDao;
+import com.jarry.app.ui.activity.CreateOrgActivity;
 import com.jarry.app.ui.activity.LoginActivity;
 import com.jarry.app.ui.presenter.UserPresenter;
 import com.jarry.app.ui.view.IUserView;
@@ -238,5 +242,22 @@ public class MyFragment extends MVPBaseFragment<IUserView, UserPresenter> implem
 
         mViewPager.setAdapter(new ViewPagerFgAdapter(getChildFragmentManager(), fragmentList, "Message"));//给ViewPager设置适配器
         tabLayout.setupWithViewPager(mViewPager);//将TabLayout和ViewPager关联起来
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.main_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_exit:
+                getActivity().finish();
+                App.exit();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

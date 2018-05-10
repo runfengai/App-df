@@ -18,7 +18,7 @@ import com.jarry.app.bean.UserComm;
 import com.jarry.app.fragment.ActiveFragment;
 import com.jarry.app.fragment.FindFragment;
 import com.jarry.app.fragment.MyFragment;
-import com.jarry.app.fragment.ServiceFragment;
+import com.jarry.app.fragment.LectureFragment;
 import com.jarry.app.fragment.SignFragment;
 import com.jarry.app.model.TabItem;
 
@@ -57,22 +57,22 @@ public class MainActivity extends AppCompatActivity {
         sUser = new UserComm(id, user.getScreen_name());
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_exit) {
-            finish();
-            App.exit();
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        if (item.getItemId() == R.id.menu_exit) {
+//            finish();
+//            App.exit();
+//            return true;
+//        } else {
+//            return super.onOptionsItemSelected(item);
+//        }
+//    }
 
     /**
      * 更新新消息数量
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         mFragmentList.add(new TabItem(
                 R.mipmap.tab_settings_normal,
                 R.mipmap.tab_settings_selected, "服务",
-                ServiceFragment.class, R.color.colorTabText
+                LectureFragment.class, R.color.colorTabText
         ));
         mFragmentList.add(new TabItem(
                 R.mipmap.tab_wechat_normal,

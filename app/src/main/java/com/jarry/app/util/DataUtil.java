@@ -89,7 +89,7 @@ public class DataUtil {
 
     public static String convertGMTToLoacale(Date date) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", new Locale("English"));
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.ENGLISH);
 //            SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM");
             String result = sdf.format(date);
             return result;

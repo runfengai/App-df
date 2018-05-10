@@ -6,26 +6,17 @@ import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
-
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jarry.app.App;
 import com.jarry.app.R;
-import com.jarry.app.adapter.FindListAdapter;
+import com.jarry.app.adapter.ActiveListAdapter;
 import com.jarry.app.base.BasePresenter;
-import com.jarry.app.bean.Status;
-import com.jarry.app.bean.UserComm;
-import com.jarry.app.db.StatusDao;
-import com.jarry.app.ui.activity.MainActivity;
-import com.jarry.app.ui.view.IFindView;
-import com.jarry.app.util.CommentFun;
-import com.jarry.app.util.CustomTagHandler;
+import com.jarry.app.bean.ActiveBean;
+import com.jarry.app.ui.view.ILectureView;
+import com.jarry.app.ui.view.ILectureView;
 import com.jarry.app.util.PrefUtils;
-import com.litesuits.orm.LiteOrm;
-import com.litesuits.orm.db.model.ConflictAlgorithm;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -41,76 +32,33 @@ import java.util.List;
 import java.util.Map;
 
 
-public class FindPresenter extends BasePresenter<IFindView> {
+public class LecturePresenter extends BasePresenter<ILectureView> {
 
     private static final String TAG = "FindPresenter";
 
     private Context context;
-    private IFindView homeView;
+    private ILectureView homeView;
     private RecyclerView recyclerView;
-    private FindListAdapter adapter;
-    private List<Status> mList = new ArrayList<>();
-    private List<Status> onePagelist = new ArrayList<>();
+    private ActiveListAdapter adapter;
+    private List<ActiveBean> mList = new ArrayList<>();
+    private List<ActiveBean> onePagelist = new ArrayList<>();
     private LinearLayoutManager layoutManager;
     private int lastVisibleItem;
     private boolean isLoadMore = false; // 是否加载过更多
-    private boolean noMore = false;
 
-    public FindPresenter(Context ctx) {
+
+    public LecturePresenter(Context ctx) {
         this.context = ctx;
     }
 
     public void getWeiBoTimeLine() {
-        noMore = false;
         homeView = getHomeView();
         if (homeView != null) {
             recyclerView = homeView.getRecyclerView();
             layoutManager = homeView.getLayoutManager();
-            List<Status> cached = getPageOneDataFromDB();
-            if (cached == null || cached.size() < 1) {
-                getPageOneDataFromNet();
-                saveListToDB(onePagelist);
-            } else {
-                onePagelist = cached;
-            }
-            isLoadMore = false;
-
-            //查询id
-            List<Status> cachedNN = getPageOneDataFromDB();
-            onePagelist = cachedNN;
-//            Log.e("TT", new Gson().toJson(onePagelist));
+            getPageOneData();
             ((Activity) context).runOnUiThread(() -> disPlayWeiBoList(onePagelist, context, homeView, recyclerView));
         }
-    }
-
-    private void saveListToDB(List<Status> onePagelist) {
-        Gson gson = new Gson();
-        for (Status status : onePagelist) {
-            status.userStr = gson.toJson(status.getUser());
-            status.mCommentStr = gson.toJson(status.mComment);
-            status.likeUsersStr = gson.toJson(status.likeUsers);
-        }
-        LiteOrm liteOrm = LiteOrm.newCascadeInstance(context, "find.db");
-        liteOrm.cascade().save(onePagelist);
-
-        App.mDb.cascade().save(onePagelist);
-//        for (Status status : onePagelist) {
-//            App.mDb.insert(status);
-//        }
-        Log.e("TT", "= onePagelist.size()=" + onePagelist.size());
-
-    }
-
-    public void showSendWeibo(Status status) {
-        mList.add(0, status);
-        Gson gson = new Gson();
-        status.userStr = gson.toJson(status.getUser());
-        status.mCommentStr = gson.toJson(status.mComment);
-        status.likeUsersStr = gson.toJson(status.likeUsers);
-        //存储到本地数据库
-//        App.mDb.insert(status, ConflictAlgorithm.Replace);
-        adapter.notifyDataSetChanged();
-        StatusDao.save(status);
     }
 
     public void getMore() {
@@ -118,20 +66,18 @@ public class FindPresenter extends BasePresenter<IFindView> {
         if (homeView != null) {
             recyclerView = homeView.getRecyclerView();
             layoutManager = homeView.getLayoutManager();
-            List<Status> more = getMoreData();
-            if (more != null && more.size() > 0) {
-                App.mDb.cascade().save(more);
-            }
-            isLoadMore = true;
+            List<ActiveBean> more = getMoreData();
             disPlayWeiBoList(more, context, homeView, recyclerView);
         }
     }
 
-    private List<Status> getMoreData() {
-//        if (onePagelist != null && onePagelist.size() > 0) {
-//            List<Status> res = deepCopy(onePagelist);
-//            return res;
-//        }
+    private List<ActiveBean> getMoreData() {
+        if (onePagelist != null && onePagelist.size() > 0) {
+            List<ActiveBean> res = deepCopy(onePagelist);
+            for (ActiveBean activeBean : res)
+                activeBean.hasParticipate = false;
+            return res;
+        }
         return null;
     }
 
@@ -152,20 +98,12 @@ public class FindPresenter extends BasePresenter<IFindView> {
 
     }
 
-    private List<Status> getPageOneDataFromDB() {
-        try {
-            return StatusDao.getAll();
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    private List<Status> getPageOneDataFromNet() {
+    private List<ActiveBean> getPageOneData() {
         if (onePagelist != null && onePagelist.size() > 0) {
             return onePagelist;
         }
         try {
-            InputStream inputStream = context.getAssets().open("findlist.json");
+            InputStream inputStream = context.getAssets().open("lecturelist.json");
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(inputStream));
             StringBuilder stringBuilder = new StringBuilder();
@@ -174,7 +112,7 @@ public class FindPresenter extends BasePresenter<IFindView> {
                 stringBuilder.append(str);
             }
             String res = stringBuilder.toString();
-            return onePagelist = new Gson().fromJson(res, new TypeToken<List<Status>>() {
+            return onePagelist = new Gson().fromJson(res, new TypeToken<List<ActiveBean>>() {
             }.getType());
         } catch (IOException e) {
             e.printStackTrace();
@@ -193,7 +131,7 @@ public class FindPresenter extends BasePresenter<IFindView> {
 //                });
     }
 
-    private IFindView getHomeView() {
+    private ILectureView getHomeView() {
         if (isViewAttached()) {
             return getView();
         } else {
@@ -236,46 +174,19 @@ public class FindPresenter extends BasePresenter<IFindView> {
     }
 
     // refresh data
-    private void disPlayWeiBoList(List<Status> list, Context context, IFindView homeView, RecyclerView recyclerView) {
+    private void disPlayWeiBoList(List<ActiveBean> list, Context context, ILectureView homeView, RecyclerView recyclerView) {
         if (isLoadMore) {
+            isLoadMore = false;
             if (max_id.equals("0")) {
                 adapter.updateLoadStatus(adapter.LOAD_NONE);
                 return;
             }
-            if (list != null && list.size() > 0) {
-                mList.addAll(list);
-            } else {
-                noMore = true;
-                Toast.makeText(context, "没有更多数据", Toast.LENGTH_LONG).show();
-            }
+            mList.addAll(list);
             adapter.notifyDataSetChanged();
         } else {
             mList.clear();
-            try {
-                mList.addAll(list);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            adapter = new FindListAdapter(context, mList, "home_fg", new CustomTagHandler(context, new CustomTagHandler.OnCommentClickListener() {
-                @Override
-                public void onCommentatorClick(View view, UserComm commentator) {
-                    Toast.makeText(context, commentator.mName, Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onReceiverClick(View view, UserComm receiver) {
-                    Toast.makeText(context, receiver.mName, Toast.LENGTH_SHORT).show();
-                }
-
-                // 点击评论内容，弹出输入框回复评论
-                @Override
-                public void onContentClick(View view, UserComm commentator, UserComm receiver) {
-                    if (commentator != null && commentator.mId == MainActivity.sUser.mId) { // 不能回复自己的评论
-                        return;
-                    }
-//                    inputComment(view, commentator);
-                }
-            }), recyclerView);
+            mList.addAll(list);
+            adapter = new ActiveListAdapter(context, mList, true);
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }
@@ -285,24 +196,8 @@ public class FindPresenter extends BasePresenter<IFindView> {
     }
 
     /**
-     * 弹出评论对话框
-     *
-     * @param v
-     * @param receiver
-     */
-//    public void inputComment(final View v, UserComm receiver) {
-//        CommentFun.inputComment(((Activity) context), recyclerView, v, receiver, new CommentFun.InputCommentListener() {
-//            @Override
-//            public void onCommitComment() {
-//                adapter.notifyDataSetChanged();
-//            }
-//        });
-//    }
-
-    /**
      * recyclerView Scroll listener , maybe in here is wrong ?
      */
-
     public void scrollRecycleView() {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -312,13 +207,11 @@ public class FindPresenter extends BasePresenter<IFindView> {
                     lastVisibleItem = layoutManager
                             .findLastVisibleItemPosition();
                     if (lastVisibleItem + 1 == layoutManager
-                            .getItemCount() && !noMore) {
+                            .getItemCount()) {
                         adapter.updateLoadStatus(adapter.LOAD_PULL_TO);
                         isLoadMore = true;
                         adapter.updateLoadStatus(adapter.LOAD_MORE);
-                        new Handler().postDelayed(() -> {
-                            getMore();
-                        }, 1000);
+                        new Handler().postDelayed(() -> getMore(), 1000);
                     }
                 }
             }

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 import com.jarry.app.base.MVPBaseFragment;
+import com.jarry.app.fragment.MessageFragment;
 
 import java.util.List;
 
@@ -27,8 +28,15 @@ public class ViewPagerFgAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-
-        return fragmentList.get(position);
+        switch (position) {
+            case 0:
+                return MessageFragment.newInstance("my_active");
+            case 1:
+                return MessageFragment.newInstance("get_like");
+            case 2:
+                return MessageFragment.newInstance("send_comment");
+        }
+        return null;
     }
 
 

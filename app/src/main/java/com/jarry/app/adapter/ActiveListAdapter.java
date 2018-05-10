@@ -40,10 +40,17 @@ public class ActiveListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private static final int TYPE_FOOTER = -1;
     private int ActiveBean = 1;
+    boolean isLecture = false;
 
     public ActiveListAdapter(Context context, List list) {
         this.context = context;
         this.list = list;
+    }
+
+    public ActiveListAdapter(Context context, List list, boolean isLecture) {
+        this.context = context;
+        this.list = list;
+        this.isLecture = isLecture;
     }
 
     @Override
@@ -161,19 +168,23 @@ public class ActiveListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             // text
             tv_weibo_text.setMovementMethod(LinkMovementMethod.getInstance());
             tv_weibo_text.setText(StringUtil.getWeiBoText(context, activeBean.description));
-            btnJoin.setText("申请加入");
+            btnJoin.setText(isLecture ? "预约讲座" : "申请加入");
             btnJoin.setEnabled(true);
             if (activeBean.hasParticipate) {
-                btnJoin.setText("已加入");
+                btnJoin.setText(isLecture ? "已预约" : "已加入");
                 btnJoin.setEnabled(false);
             } else {
+                btnJoin.setText(isLecture ? "预约讲座" : "申请加入");
+                btnJoin.setEnabled(true);
             }
             btnJoin.setOnClickListener(view -> {
                 activeBean.hasParticipate = true;
-                btnJoin.setText("已加入");
+                if (isLecture) {
+                    btnJoin.setText("已加入");
+                } else btnJoin.setText("已预约");
                 btnJoin.setEnabled(false);
                 notifyDataSetChanged();
-                Toast.makeText(context, "加入成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, isLecture ? "预约成功" : "加入成功", Toast.LENGTH_SHORT).show();
 
             });
         }

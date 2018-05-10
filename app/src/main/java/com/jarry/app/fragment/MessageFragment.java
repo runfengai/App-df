@@ -68,6 +68,7 @@ public class MessageFragment extends MVPBaseFragment<IMessageFgView, MessageFgPr
             case "my_active":
                 setDataRefresh(true);
                 mPresenter.getMessageActive();
+                mPresenter.scrollRecycleView();
                 break;
             case "get_like":
                 setDataRefresh(true);

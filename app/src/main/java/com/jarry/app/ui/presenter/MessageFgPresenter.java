@@ -77,6 +77,7 @@ public class MessageFgPresenter extends BasePresenter<IMessageFgView> {
 
 
     public void getMore() {
+        isLoadMore = true;
         homeView = getHomeView();
         if (homeView != null) {
             recyclerView = homeView.getRecyclerView();
@@ -87,10 +88,6 @@ public class MessageFgPresenter extends BasePresenter<IMessageFgView> {
     }
 
     private List<Status> getMoreData() {
-        if (onePagelist != null && onePagelist.size() > 0) {
-            List<Status> res = deepCopy(onePagelist);
-            return res;
-        }
         return null;
     }
 
@@ -189,17 +186,17 @@ public class MessageFgPresenter extends BasePresenter<IMessageFgView> {
     // refresh data
     private void disPlayWeiBoList(List<Status> list, Context context, IMessageFgView homeView, RecyclerView recyclerView) {
         if (isLoadMore) {
-            isLoadMore = false;
-            if (max_id.equals("0")) {
+            if (list != null) {
+                mList.addAll(list);
+            } else {
                 adapter.updateLoadStatus(adapter.LOAD_NONE);
                 return;
             }
-            if (list != null)
-                mList.addAll(list);
             adapter.notifyDataSetChanged();
         } else {
             mList.clear();
-            mList.addAll(list);
+            if (list != null)
+                mList.addAll(list);
             adapter = new FindListAdapter(context, mList, "home_fg", new CustomTagHandler(context, new CustomTagHandler.OnCommentClickListener() {
                 @Override
                 public void onCommentatorClick(View view, UserComm commentator) {
@@ -217,7 +214,7 @@ public class MessageFgPresenter extends BasePresenter<IMessageFgView> {
                     if (commentator != null && commentator.mId == MainActivity.sUser.mId) { // 不能回复自己的评论
                         return;
                     }
-                    inputComment(view, commentator);
+//                    inputComment(view, commentator);
                 }
             }), recyclerView);
             recyclerView.setAdapter(adapter);
@@ -234,14 +231,14 @@ public class MessageFgPresenter extends BasePresenter<IMessageFgView> {
      * @param v
      * @param receiver
      */
-    public void inputComment(final View v, UserComm receiver) {
-        CommentFun.inputComment(((Activity) context), recyclerView, v, receiver, new CommentFun.InputCommentListener() {
-            @Override
-            public void onCommitComment() {
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
+//    public void inputComment(final View v, UserComm receiver) {
+//        CommentFun.inputComment(((Activity) context), recyclerView, v, receiver, new CommentFun.InputCommentListener() {
+//            @Override
+//            public void onCommitComment() {
+//                adapter.notifyDataSetChanged();
+//            }
+//        });
+//    }
 
     /**
      * recyclerView Scroll listener , maybe in here is wrong ?
@@ -274,6 +271,7 @@ public class MessageFgPresenter extends BasePresenter<IMessageFgView> {
     }
 
     public void getMessageActive() {
+        isLoadMore = false;
         homeView = getHomeView();
         if (homeView != null) {
             recyclerView = homeView.getRecyclerView();

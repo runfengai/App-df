@@ -1,5 +1,6 @@
 package com.jarry.app.bean;
 
+import com.google.gson.Gson;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
@@ -55,6 +56,14 @@ public class Status implements Serializable, Cloneable {
     public ArrayList<User> likeUsers; // 点赞列表
     @Column("likeUsersStr")
     public String likeUsersStr;
+
+    public void setLikeUsersStr() {
+        this.likeUsersStr = new Gson().toJson(likeUsers);
+    }
+
+    public void setmCommentStr() {
+        this.mCommentStr = new Gson().toJson(mComment);
+    }
 
     public String getCreated_at() {
         return created_at;
@@ -239,4 +248,5 @@ public class Status implements Serializable, Cloneable {
                 ", user=" + user +
                 '}';
     }
+
 }

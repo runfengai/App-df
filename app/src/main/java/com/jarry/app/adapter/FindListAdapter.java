@@ -31,6 +31,7 @@ import com.jarry.app.bean.Photo;
 import com.jarry.app.bean.Status;
 import com.jarry.app.bean.User;
 import com.jarry.app.bean.UserComm;
+import com.jarry.app.db.StatusDao;
 import com.jarry.app.ui.activity.CommentAndRepostActivity;
 import com.jarry.app.ui.activity.MainActivity;
 import com.jarry.app.util.CommentFun;
@@ -274,14 +275,18 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
          * @param receiver
          */
         public void inputComment(final View v, UserComm receiver) {
-            CommentFun.inputComment((Activity) context, recyclerView, v, receiver, new CommentFun.InputCommentListener() {
+            Status status = (Status) v.getTag();
+            CommentFun.inputComment(status, (Activity) context, recyclerView, v, receiver, new CommentFun.InputCommentListener() {
                 @Override
                 public void onCommitComment() {
                     //存数据库
-                    Status status = (Status) v.getTag();
+                    status.setmCommentStr();
                     Log.e("ttt", new Gson().toJson(receiver));
-                    Log.e("tt", status == null ? "null" : new Gson().toJson(status.mComment));
+                    Log.e("更改之后的消息", status == null ? "null" : new Gson().toJson(status));
+                    //插入之前改下数据格式
                     App.mDb.insert(status, ConflictAlgorithm.Replace);
+                    Log.e("更改之后的消息", "--->" + new Gson().toJson(StatusDao.getAll()));
+                    ;
                     notifyDataSetChanged();
                 }
             });
@@ -361,6 +366,7 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         if (user.getName().equals(User.getLoginUser().getName())) {
                             status.likeUsers.remove(user);
                             //删除喜欢
+                            status.setLikeUsersStr();
                             App.mDb.insert(status, ConflictAlgorithm.Replace);
                             setDrawableSize(tv_weibo_attitudes_count, R.drawable.good_16px);
                             notifyDataSetChanged();
@@ -372,6 +378,7 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     status.likeUsers = new ArrayList<>();
                 }
                 status.likeUsers.add(User.getLoginUser());
+                status.setLikeUsersStr();
                 App.mDb.insert(status, ConflictAlgorithm.Replace);
                 setDrawableSize(tv_weibo_attitudes_count, R.drawable.good_h);
                 notifyDataSetChanged();
@@ -387,9 +394,14 @@ public class FindListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
 
             //评论
+            Log.e("tag", "status.getText=" + status.getText());
+            Log.e("tag", "status.mComment=" + new Gson().toJson(status.mComment));
             if (status.mComment != null && status.mComment.size() > 0) {
+                mCommentList.setVisibility(View.VISIBLE);
                 CommentFun.parseCommentList(context, status.mComment,
                         mCommentList, mBtnInput, mTagHandler);
+            } else {
+                mCommentList.setVisibility(View.GONE);
             }
 
 

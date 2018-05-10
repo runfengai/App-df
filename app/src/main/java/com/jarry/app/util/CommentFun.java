@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.jarry.app.R;
 import com.jarry.app.bean.Comment;
+import com.jarry.app.bean.Status;
 import com.jarry.app.bean.UserComm;
 import com.jarry.app.ui.activity.MainActivity;
 
@@ -73,6 +74,7 @@ public class CommentFun {
 
                 textView.setTag(KEY_COMMENT_SOURCE_COMMENT_LIST, mCommentList);
             } catch (Exception e) {
+                e.printStackTrace();
             }
 
 
@@ -151,14 +153,21 @@ public class CommentFun {
 
     }
 
+
+
     /**
      * 弹出评论对话框
      */
-    public static void inputComment(final Activity activity, final RecyclerView listView,
+    public static void inputComment(Status status, final Activity activity, final RecyclerView listView,
                                     final View btnComment, final UserComm receiver,
                                     final InputCommentListener listener) {
-
-        final ArrayList<Comment> commentList = (ArrayList) btnComment.getTag(KEY_COMMENT_SOURCE_COMMENT_LIST);
+        ArrayList<Comment> commentListNew = null;
+        ArrayList<Comment> commentList = status.mComment;
+        if (commentList == null) {
+            commentListNew = new ArrayList<>();
+            status.mComment = commentListNew;
+        } else commentListNew = commentList;
+//        final ArrayList<Comment> commentList = (ArrayList) btnComment.getTag(KEY_COMMENT_SOURCE_COMMENT_LIST);
 
         String hint;
         if (receiver != null) {
@@ -174,6 +183,7 @@ public class CommentFun {
         }
 
         //弹出评论对话框
+        ArrayList<Comment> finalCommentListNew = commentListNew;
         showInputComment(activity, hint, new CommentDialogListener() {
             @Override
             public void onClickPublish(final Dialog dialog, EditText input, final TextView btn) {
@@ -185,12 +195,17 @@ public class CommentFun {
                 btn.setClickable(false);
                 final long receiverId = receiver == null ? -1 : receiver.mId;
                 Comment comment = new Comment(MainActivity.sUser, content, receiver);
-                commentList.add(comment);
+//                try {
+                finalCommentListNew.add(comment);
                 if (listener != null) {
                     listener.onCommitComment();
                 }
                 dialog.dismiss();
                 Toast.makeText(activity, "评论成功", Toast.LENGTH_SHORT).show();
+//                } catch (Exception e) {
+//
+//                }
+
             }
 
             /**
